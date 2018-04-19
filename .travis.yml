@@ -1,0 +1,26 @@
+language: android
+
+before_install: chmod +x ./gradlew
+
+android:
+  components:
+    - tools
+    - platform-tools
+    - tools
+    - build-tools-27.0.3
+    - android-26
+  licensed:
+    - 'android-sdk-license-.+'
+
+# FIXME (RTNelo): Travis don't support emulating SDK 25+. add instrumentation tests later.
+script: ./gradlew build test
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
