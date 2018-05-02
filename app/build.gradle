@@ -41,4 +41,8 @@ dependencies {
     annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
 
     implementation 'org.apache.commons:commons-collections4:4.1'
+    implementation 'org.apache.commons:commons-lang3:3.7'
+
+    testImplementation 'org.mockito:mockito-core:2.18.3'
+    androidTestImplementation 'org.mockito:mockito-android:2.18.3'
 }
