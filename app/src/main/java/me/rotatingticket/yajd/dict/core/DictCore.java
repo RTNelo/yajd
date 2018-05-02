@@ -1,4 +1,4 @@
-package me.rotatingticket.yajd.dict;
+package me.rotatingticket.yajd.dict.core;
 
 import android.support.annotation.Nullable;
 

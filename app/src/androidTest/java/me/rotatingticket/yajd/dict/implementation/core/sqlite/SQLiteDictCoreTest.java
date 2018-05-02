@@ -1,4 +1,4 @@
-package me.rotatingticket.yajd.dict.sqlitedict;
+package me.rotatingticket.yajd.dict.implementation.core.sqlite;
 
 import android.arch.persistence.room.Room;
 import android.content.Context;

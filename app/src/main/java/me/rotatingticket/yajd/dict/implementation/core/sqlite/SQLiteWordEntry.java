@@ -1,4 +1,4 @@
-package me.rotatingticket.yajd.dict.sqlitedict;
+package me.rotatingticket.yajd.dict.implementation.core.sqlite;
 
 import android.arch.persistence.room.Embedded;
 import android.arch.persistence.room.Relation;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import me.rotatingticket.yajd.dict.WordEntry;
+import me.rotatingticket.yajd.dict.core.WordEntry;
 
 /**
  * The implementation of WordEntry also providing some utilities for testing.

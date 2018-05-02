@@ -1,4 +1,4 @@
-package me.rotatingticket.yajd.dict.sqlitedict;
+package me.rotatingticket.yajd.dict.implementation.core.sqlite;
 
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import me.rotatingticket.yajd.dict.DictCore;
+import me.rotatingticket.yajd.dict.core.DictCore;
 
 /**
  * The implementation of DictCore based on Room.
