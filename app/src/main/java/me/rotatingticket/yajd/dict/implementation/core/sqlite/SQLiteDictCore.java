@@ -78,12 +78,12 @@ public abstract class SQLiteDictCore implements DictCore {
               .replace("%", "\\%");
     }
 
-    public Iterable<SQLiteWordEntry> getWordEntriesByWordPrefix(String wordPrefix, int limit) {
+    public List<SQLiteWordEntry> getWordEntriesByWordPrefix(String wordPrefix, int limit) {
         return getByLikeWord(replaceLikePattern(wordPrefix) + "%", limit);
     }
 
     @Transaction
-    public Iterable<SQLiteWordEntry> getWordEntriesByRomajiPrefix(String romajiPrefix, int limit) {
+    public List<SQLiteWordEntry> getWordEntriesByRomajiPrefix(String romajiPrefix, int limit) {
         String template = replaceLikePattern(romajiPrefix) + "%";
         List<Integer> wordEntryIds = getWordRecordIdByLikeRomaji(template, limit);
         List<SQLiteWordEntry> wordEntries = getWordEntriesByIds(wordEntryIds);

@@ -21,7 +21,7 @@ public interface DictCore {
      * @param romaji target romaji.
      * @return list of the target word entry, ordered by matching romaji.
      */
-    Iterable<? extends WordEntry> getWordEntriesByRomaji(String romaji);
+    List<? extends WordEntry> getWordEntriesByRomaji(String romaji);
 
     /**
      * Multi-get version of getWordEntryByWord.
@@ -47,7 +47,7 @@ public interface DictCore {
      * @param limit should return at most limit result
      * @return a list of result word entries, ordered by matching word. .size() is lte to limit.
      */
-    Iterable<? extends WordEntry> getWordEntriesByWordPrefix(String wordPrefix, int limit);
+    List<? extends WordEntry> getWordEntriesByWordPrefix(String wordPrefix, int limit);
 
     /**
      * Get a list of word entries of which the romaji have the prefix equals to wordPrefix.
@@ -55,5 +55,5 @@ public interface DictCore {
      * @param limit should return at most limit result
      * @return a list of result word entries, ordered by matching romaji. .size() is lte to limit.
      */
-    Iterable<? extends WordEntry> getWordEntriesByRomajiPrefix(String romajiPrefix, int limit);
+    List<? extends WordEntry> getWordEntriesByRomajiPrefix(String romajiPrefix, int limit);
 }
