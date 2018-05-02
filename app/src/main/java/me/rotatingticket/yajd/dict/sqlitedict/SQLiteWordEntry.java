@@ -58,8 +58,8 @@ public class SQLiteWordEntry extends WordEntry {
     @Override
     public ArrayList<String> getRomajis() {
         ArrayList<String> romajis = new ArrayList<>(wordRomajis.size());
-        for (int i = 0; i != wordRomajis.size(); ++i) {
-            romajis.set(i, wordRomajis.get(i).getRomaji());
+        for (SQLiteWordRomaji romaji : wordRomajis) {
+            romajis.add(romaji.getRomaji());
         }
         return romajis;
     }

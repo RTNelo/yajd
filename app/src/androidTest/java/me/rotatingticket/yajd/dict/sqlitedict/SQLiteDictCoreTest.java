@@ -44,13 +44,29 @@ public class SQLiteDictCoreTest {
     public void getWordEntryByWord() {
         SQLiteWordEntry entry = SQLiteWordEntry.construct("今日は", "konnichiha", "説明");
         coreDict.insert(entry);
-        assertEquals(entry, coreDict.getWordEntryByWord("今日は"));
+        SQLiteWordEntry actual = coreDict.getWordEntryByWord("今日は");
+        assertEquals(entry, actual);
+
+        ArrayList<String> romajis = new ArrayList<>(1);
+        romajis.add("konnichiha");
+        assertEquals(romajis, actual.getRomajis());
 
         // DictCore doesn't support spell correction
         assertNull(coreDict.getWordEntryByWord("こんにちわ"));
 
         // DictCore doesn't support translating kana to romaji
         assertNull(coreDict.getWordEntryByWord("こんにちは"));
+
+        // Test multiple romajis
+        SQLiteWordEntry entry2 = SQLiteWordEntry.construct("今日", new String[]{"kyo", "konjitsu"}, "説明");
+        coreDict.insert(entry2);
+        SQLiteWordEntry actual2 = coreDict.getWordEntryByWord("今日");
+        assertEquals(entry2, actual2);
+
+        ArrayList<String> romajis2 = new ArrayList<>(2);
+        romajis2.add("kyo");
+        romajis2.add("konjitsu");
+        assertEquals(romajis2, actual2.getRomajis());
     }
 
     @Test
