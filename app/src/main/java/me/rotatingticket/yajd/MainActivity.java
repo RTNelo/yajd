@@ -22,9 +22,14 @@ public class MainActivity extends AppCompatActivity {
 
     private CardView candidatesCardView;
 
+    /**
+     * The adapter of the list view of candidate word entry.
+     * Use a CandidateView as views of items,
+     * then use corresponding WordEntry to fill the view content.
+     */
     private static class CandidatesAdapter extends BaseAdapter {
 
-        Context context;
+        private Context context;
         private List<? extends WordEntry> candidates;
 
         CandidatesAdapter(Context context, List<? extends WordEntry> candidates) {
@@ -77,12 +82,19 @@ public class MainActivity extends AppCompatActivity {
         setUpSearchView(searchView);
     }
 
+    /**
+     * Prepare the candidate list view.
+     * Set the observer of viewModel's getCandidates to update the ListView.
+     * @param candidatesView the candidate list view.
+     */
     private void setUpCandidatesView(ListView candidatesView) {
         viewModel.getCandidates().observe(this, candidates -> {
+            // only show the candidate list view card if have candidates.
             candidatesCardView.setVisibility(
                   candidates == null || candidates.size() == 0 ? View.INVISIBLE : View.VISIBLE
             );
             if (candidatesAdapter == null) {
+                // create the adapter first time the candidates changed.
                 candidatesAdapter = new CandidatesAdapter(this, candidates);
                 candidatesView.setAdapter(candidatesAdapter);
             } else {
@@ -91,10 +103,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Prepare the search view.
+     * Trigger the query for search suggestion when the query string changed.
+     * @param searchView the search view.
+     */
     private void setUpSearchView(SearchView searchView) {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                // do not care the submit event
                 return false;
             }
 

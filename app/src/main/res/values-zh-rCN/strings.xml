@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dict_search_hint">查词</string>
+    <string name="title_notifications">通知</string>
+    <string name="title_dashboard">仪表盘</string>
+</resources>
