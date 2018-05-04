@@ -5,13 +5,17 @@ import android.app.SearchableInfo;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import me.rotatingticket.yajd.dict.core.WordEntry;
 import me.rotatingticket.yajd.util.WordEntryAdapter;
 import me.rotatingticket.yajd.view.CandidateWordEntryView;
 import me.rotatingticket.yajd.viewmodel.MainActivityViewModel;
@@ -42,6 +46,14 @@ public class MainActivity extends AppCompatActivity {
      * @param candidatesView the candidate list view.
      */
     private void setUpCandidatesView(ListView candidatesView) {
+        candidatesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                WordEntry wordEntry = wordEntryAdapter.getItem(position);
+                launchLookUpResultActivity(wordEntry);
+            }
+        });
+
         viewModel.getCandidates().observe(this, candidates -> {
             // only show the candidate list view card if have candidates.
             candidatesCardView.setVisibility(
@@ -85,5 +97,19 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    /**
+     * Launch a LookUpResultActivity to display a WordEntry.
+     * @param wordEntry The WordEntry to display.
+     */
+    private void launchLookUpResultActivity(WordEntry wordEntry) {
+        Intent intent = new Intent(this, LookUpResultActivity.class);
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri data = new Uri.Builder()
+              .appendQueryParameter(LookUpResultActivity.VIEW_ACTION_DATA_KEY, wordEntry.getWord())
+              .build();
+        intent.setData(data);
+        startActivity(intent);
     }
 }

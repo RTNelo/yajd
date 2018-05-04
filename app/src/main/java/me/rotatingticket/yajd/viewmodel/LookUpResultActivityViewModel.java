@@ -6,6 +6,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.rotatingticket.yajd.dict.Dict;
@@ -38,6 +39,17 @@ public class LookUpResultActivityViewModel extends AndroidViewModel {
     public void handleQuery(String query) {
         AsyncTask.execute(() -> {
             lookUpResults.postValue(dict.userQuery(query));
+        });
+    }
+
+    public void handleView(String word) {
+        AsyncTask.execute(() -> {
+            WordEntry wordEntry = dict.userView(word);
+            ArrayList<WordEntry> wordEntries = new ArrayList<>(1);
+            if (wordEntry != null) {
+                wordEntries.add(wordEntry);
+            }
+            lookUpResults.postValue(wordEntries);
         });
     }
 }
