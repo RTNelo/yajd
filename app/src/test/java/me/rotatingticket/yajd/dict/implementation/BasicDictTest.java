@@ -3,7 +3,6 @@ package me.rotatingticket.yajd.dict.implementation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ class BasicDictTest extends MockitoTestCase {
         reset(dictCore);
 
 
-        assertEquals(stub, dict.userQuery(query, limit));
+        assertEquals(stub, dict.userQuerySuggestion(query, limit));
         verify(dictCore).getWordEntriesByWordPrefix(query, limit);
     }
 
@@ -49,7 +48,7 @@ class BasicDictTest extends MockitoTestCase {
         reset(dictCore);
 
 
-        assertEquals(stub, dict.userQuery(query, limit));
+        assertEquals(stub, dict.userQuerySuggestion(query, limit));
         verify(dictCore).getWordEntriesByRomajiPrefix(query, limit);
     }
 }

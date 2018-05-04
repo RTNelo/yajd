@@ -14,23 +14,23 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
 /**
  * The view of candidate word entry for custom dict search suggestion.
  */
-public class CandidateView extends LinearLayout {
+public class CandidateWordEntryView extends LinearLayout implements WordEntryView {
     private TextView wordView;
     private TextView pronunciationView;
 
-    public CandidateView(Context context) {
+    public CandidateWordEntryView(Context context) {
         this(context, null);
     }
 
-    public CandidateView(Context context, @Nullable AttributeSet attrs) {
+    public CandidateWordEntryView(Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public CandidateView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public CandidateWordEntryView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         this(context, attrs, defStyleAttr, 0);
     }
 
-    public CandidateView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public CandidateWordEntryView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }

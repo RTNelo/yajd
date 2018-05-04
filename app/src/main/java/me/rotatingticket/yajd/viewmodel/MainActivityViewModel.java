@@ -2,7 +2,6 @@ package me.rotatingticket.yajd.viewmodel;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -10,12 +9,10 @@ import android.support.annotation.NonNull;
 import java.util.List;
 
 import me.rotatingticket.yajd.dict.Dict;
-import me.rotatingticket.yajd.dict.core.DictCore;
 import me.rotatingticket.yajd.dict.core.WordEntry;
 import me.rotatingticket.yajd.dict.implementation.BasicDict;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictCore;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictDatabase;
-import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteWordEntry;
 
 /**
  * ViewModel for MainActivity.
@@ -54,7 +51,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public void query(String input) {
         AsyncTask.execute(() -> {
-            candidates.postValue(dict.userQuery(input, CANDIDATE_LIMIT));
+            candidates.postValue(dict.userQuerySuggestion(input, CANDIDATE_LIMIT));
         });
     }
 }

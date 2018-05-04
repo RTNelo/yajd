@@ -1,73 +1,27 @@
 package me.rotatingticket.yajd;
 
+import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import java.util.List;
-
-import me.rotatingticket.yajd.dict.core.WordEntry;
-import me.rotatingticket.yajd.view.CandidateView;
+import me.rotatingticket.yajd.util.WordEntryAdapter;
+import me.rotatingticket.yajd.view.CandidateWordEntryView;
 import me.rotatingticket.yajd.viewmodel.MainActivityViewModel;
 
 public class MainActivity extends AppCompatActivity {
 
     private CardView candidatesCardView;
 
-    /**
-     * The adapter of the list view of candidate word entry.
-     * Use a CandidateView as views of items,
-     * then use corresponding WordEntry to fill the view content.
-     */
-    private static class CandidatesAdapter extends BaseAdapter {
-
-        private Context context;
-        private List<? extends WordEntry> candidates;
-
-        CandidatesAdapter(Context context, List<? extends WordEntry> candidates) {
-            this.context = context;
-            this.candidates = candidates;
-        }
-
-        public void setCandidates(List<? extends WordEntry> candidates) {
-            this.candidates = candidates;
-        }
-
-        @Override
-        public int getCount() {
-            return candidates.size();
-        }
-
-        @Override
-        public WordEntry getItem(int position) {
-            return candidates.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = LayoutInflater.from(context).inflate(R.layout.search_candidate, parent, false);
-            }
-            ((CandidateView)convertView).setWordEntry(getItem(position));
-            return convertView;
-        }
-    }
-
     private MainActivityViewModel viewModel;
-    private CandidatesAdapter candidatesAdapter;
+    private WordEntryAdapter wordEntryAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,12 +47,16 @@ public class MainActivity extends AppCompatActivity {
             candidatesCardView.setVisibility(
                   candidates == null || candidates.size() == 0 ? View.INVISIBLE : View.VISIBLE
             );
-            if (candidatesAdapter == null) {
+            if (wordEntryAdapter == null) {
                 // create the adapter first time the candidates changed.
-                candidatesAdapter = new CandidatesAdapter(this, candidates);
-                candidatesView.setAdapter(candidatesAdapter);
+                wordEntryAdapter = new WordEntryAdapter(
+                      this,
+                      CandidateWordEntryView.class,
+                      R.layout.search_candidate,
+                      candidates);
+                candidatesView.setAdapter(wordEntryAdapter);
             } else {
-                candidatesAdapter.setCandidates(candidates);
+                wordEntryAdapter.setList(candidates);
             }
         });
     }
@@ -109,6 +67,11 @@ public class MainActivity extends AppCompatActivity {
      * @param searchView the search view.
      */
     private void setUpSearchView(SearchView searchView) {
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        assert searchManager != null;
+        SearchableInfo searchableInfo = searchManager.getSearchableInfo(new ComponentName(this, LookUpResultActivity.class));
+        searchView.setSearchableInfo(searchableInfo);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
