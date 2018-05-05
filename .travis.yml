@@ -1,6 +1,13 @@
 language: android
 
-before_install: chmod +x ./gradlew
+sudo: true
+
+before_install:
+  - chmod +x ./gradlew
+  - echo 'count=0' > /home/travis/.android/repositories.cfg # silence sdkmanager warning
+  - yes | sdkmanager "ndk-bundle" > /dev/null
+  - yes | sdkmanager "cmake;3.6.4111459" > /dev/null
+  - yes | sdkmanager "lldb;3.1" > /dev/null
 
 android:
   components:
