@@ -26,6 +26,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
 }
 
 dependencies {
@@ -45,6 +50,7 @@ dependencies {
 
     implementation 'org.apache.commons:commons-collections4:4.1'
     implementation 'org.apache.commons:commons-lang3:3.7'
+    implementation 'commons-io:commons-io:2.6'
 
     testImplementation 'org.mockito:mockito-core:2.18.3'
     androidTestImplementation 'org.mockito:mockito-android:2.18.3'
