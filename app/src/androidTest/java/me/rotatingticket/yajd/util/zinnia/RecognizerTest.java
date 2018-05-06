@@ -61,6 +61,11 @@ public class RecognizerTest {
                     assertEquals(result.value(0), "下");
                     assertEquals(result.score(0), 0.66, 0.1);
                 }
+
+                // second classify on same character
+                try (ResultSet result = recognizer.classify(character, 3)) {
+                    assertNotNull(result);
+                }
             }
         }
     }

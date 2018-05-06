@@ -1,6 +1,8 @@
 package me.rotatingticket.yajd.util.zinnia;
 
 import java.io.Closeable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The classify result by Recognizer.
@@ -44,4 +46,17 @@ public class ResultSet implements Closeable {
      */
     @Override
     public native void close();
+
+    /**
+     * Convert the ResultSet to a list of value string in the same order.
+     * @return The list of value string.
+     */
+    public List<String> toList() {
+        int size = (int)size();
+        ArrayList<String> result = new ArrayList<>(size);
+        for (int i = 0; i != size; ++i) {
+            result.add(value(i));
+        }
+        return result;
+    }
 }

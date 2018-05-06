@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto" >
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,33 +17,88 @@
             card_view:contentPadding="4dp"
             android:layout_margin="8dp" >
 
-            <SearchView
-                android:id="@+id/search_view"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="42dp"
-                android:inputType="text"
-                android:iconifiedByDefault="false"
-                android:queryHint="@string/dict_search_hint" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <SearchView
+                    android:id="@+id/search_view"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="42dp"
+                    android:inputType="text"
+                    android:iconifiedByDefault="false"
+                    android:queryHint="@string/dict_search_hint" />
+
+                <ImageButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_edit"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/input_by_handwriting"
+                    android:layout_gravity="center_vertical"
+                    android:adjustViewBounds="true"
+                    android:onClick="toggleHandwriting" />
+
+            </LinearLayout>
+
 
         </android.support.v7.widget.CardView>
 
         <android.support.v7.widget.CardView
             android:id="@+id/candidates_card_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:visibility="invisible"
             card_view:cardCornerRadius="4dp"
             card_view:cardElevation="2dp"
             card_view:contentPadding="4dp"
+            android:layout_weight="1"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="0dp"
-            android:layout_marginBottom="8dp" >
+            android:layout_marginBottom="2dp" >
 
             <ListView
                 android:id="@+id/candidates_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            android:id="@+id/handwriting_view"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            card_view:cardCornerRadius="4dp"
+            card_view:cardElevation="8dp"
+            card_view:contentPadding="0dp"
+            android:layout_margin="8dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/handwriting_candidates_view"
+                    android:layout_width="match_parent"
+                    android:visibility="gone"
+                    android:layout_height="32dp"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp"
+                    app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+                <me.rotatingticket.yajd.view.CanvasView
+                    android:id="@+id/canvas"
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp" />
+
+
+            </LinearLayout>
 
         </android.support.v7.widget.CardView>
 

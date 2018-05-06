@@ -6,6 +6,8 @@ import java.io.Closeable;
  * The handwriting recognizer based on zinnia.
  */
 public class Recognizer implements Closeable {
+    private static Recognizer instance;
+
     /**
      * Native code initializer.
      */
@@ -35,6 +37,18 @@ public class Recognizer implements Closeable {
     public Recognizer(String modelPath) {
         id = create();
         open(modelPath);
+    }
+
+    /**
+     * Get the singleton instance.
+     * @param modelPath If there is no instance before, use the modelPath as the model file path.
+     * @return The Recognizer instance.
+     */
+    public static synchronized Recognizer getInstance(String modelPath) {
+        if (instance == null) {
+            instance = new Recognizer(modelPath);
+        }
+        return instance;
     }
 
     private static native long create();

@@ -4,4 +4,5 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="dict_search_hint">Look up Word</string>
+    <string name="input_by_handwriting">Input by Handwriting</string>
 </resources>
