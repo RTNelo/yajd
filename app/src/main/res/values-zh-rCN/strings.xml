@@ -4,4 +4,6 @@
     <string name="title_notifications">通知</string>
     <string name="title_dashboard">仪表盘</string>
     <string name="input_by_handwriting">手写输入</string>
+    <string name="full_text_translate_netword_error">网络错误</string>
+    <string name="translate">翻译</string>
 </resources>
