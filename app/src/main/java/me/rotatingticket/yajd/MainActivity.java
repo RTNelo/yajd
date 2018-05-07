@@ -113,6 +113,9 @@ public class MainActivity extends AppCompatActivity {
 
         CardView handwritingView = findViewById(R.id.handwriting_view);
         setUpHandwriting(handwritingView);
+
+        View fabMenu = findViewById(R.id.fab_menu);
+        setUpFabMenu(fabMenu);
     }
 
     /**
@@ -379,5 +382,16 @@ public class MainActivity extends AppCompatActivity {
     void clearHandwritingCandidates() {
         handwritingCandidatesAdapter.setCandidates(null);
         handwritingCandidatesView.setVisibility(View.GONE);
+    }
+
+    /**
+     * Setup Floating Action Button Menu.
+     * @param fabMenu View of target floating action button menu.
+     */
+    private void setUpFabMenu(View fabMenu) {
+        View jumpToTranslateBtn = fabMenu.findViewById(R.id.btn_jump_to_translate);
+        jumpToTranslateBtn.setOnClickListener(
+              view -> startActivity(new Intent(this, FullTextTranslateActivity.class))
+        );
     }
 }
