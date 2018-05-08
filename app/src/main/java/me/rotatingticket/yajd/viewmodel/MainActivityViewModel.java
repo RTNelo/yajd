@@ -3,6 +3,7 @@ package me.rotatingticket.yajd.viewmodel;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
@@ -45,9 +46,18 @@ public class MainActivityViewModel extends AndroidViewModel {
 
     public MainActivityViewModel(@NonNull Application application) throws IOException {
         super(application);
-        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(application).getSQLiteCoreDict();
-        dict = new BasicDict(dictCore);
+        dict = prepareDict(application);
         recognizer = Recognizer.getInstance(prepareRecognizerModel(application));
+    }
+
+    /**
+     * Prepare dict instance.
+     * @param context The app context.
+     * @return The dict instance.
+     */
+    public static Dict prepareDict(@NonNull Context context) {
+        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(context).getSQLiteCoreDict();
+        return new BasicDict(dictCore);
     }
 
     /**

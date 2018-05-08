@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -116,6 +116,17 @@ public class MainActivity extends AppCompatActivity {
 
         View fabMenu = findViewById(R.id.fab_menu);
         setUpFabMenu(fabMenu);
+
+        startClipboardTranslationService();
+    }
+
+    private void startClipboardTranslationService() {
+        Intent intent = new Intent(this, ClipboardTranslationService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
     }
 
     /**

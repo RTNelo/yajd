@@ -6,4 +6,8 @@
     <string name="input_by_handwriting">手写输入</string>
     <string name="full_text_translate_netword_error">网络错误</string>
     <string name="translate">翻译</string>
+    <string name="clipboard_service_notification">Yajd 正在翻译您的剪贴板</string>
+    <string name="clipboard_service_word_not_found">未找到指定单词</string>
+    <string name="clipboard_service_notification_content">将单词复制到剪贴板，Yajd 将显示其翻译结果。</string>
+    <string name="service_notification_channel_name">服务通知</string>
 </resources>

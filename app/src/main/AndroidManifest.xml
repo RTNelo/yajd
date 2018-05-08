@@ -33,6 +33,11 @@
                 android:resource="@xml/searchable" />
         </activity>
         <activity android:name=".FullTextTranslateActivity" />
+
+        <service
+            android:name=".ClipboardTranslationService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
