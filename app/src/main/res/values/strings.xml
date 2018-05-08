@@ -7,4 +7,6 @@
     <string name="input_by_handwriting">Input by Handwriting</string>
     <string name="clipboard_service_notification">Yajd is translating your Clipboard</string>
     <string name="clipboard_service_word_not_found">Word not Found</string>
+    <string name="clipboard_service_notification_content">Copy word to clipboard and Yajd will show translate result.</string>
+    <string name="service_notification_channel_name">Service Notifications</string>
 </resources>
