@@ -143,7 +143,7 @@ public class ClipboardTranslationService extends BaseForegroundService {
               new Intent(this, MainActivity.class),
               0);
         Notification notification = createForegroundNotification(notificationIntent,
-              R.drawable.ic_edit,
+              R.drawable.ic_translate,
               getString(R.string.clipboard_service_notification),
               getString(R.string.clipboard_service_notification_content));
         startForeground(NOTIFICATION_ID, notification);
