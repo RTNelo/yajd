@@ -35,7 +35,7 @@
         <activity android:name=".FullTextTranslateActivity" />
 
         <service
-            android:name=".ClipboardTranslationService"
+            android:name=".service.ClipboardTranslationService"
             android:enabled="true"
             android:exported="false" />
     </application>

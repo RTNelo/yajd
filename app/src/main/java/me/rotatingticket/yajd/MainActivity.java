@@ -26,6 +26,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import me.rotatingticket.yajd.dict.core.WordEntry;
+import me.rotatingticket.yajd.service.ClipboardTranslationService;
 import me.rotatingticket.yajd.util.WordEntryAdapter;
 import me.rotatingticket.yajd.util.zinnia.Character;
 import me.rotatingticket.yajd.view.CandidateWordEntryView;
