@@ -60,4 +60,6 @@ dependencies {
 
     // floating action menu
     implementation 'com.github.clans:fab:1.6.4'
+
+    implementation 'com.rmtheis:tess-two:9.0.0'
 }

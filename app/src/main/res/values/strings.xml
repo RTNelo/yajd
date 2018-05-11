@@ -11,4 +11,5 @@
     <string name="clipboard_service_word_not_found">Word not Found</string>
     <string name="clipboard_service_notification_content">Copy word to clipboard and Yajd will show translate result.</string>
     <string name="service_notification_channel_name">Service Notifications</string>
+    <string name="screen_translation_service_label">Screen Translation Service</string>
 </resources>

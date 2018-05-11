@@ -7,15 +7,35 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
+import android.hardware.display.DisplayManager;
+import android.hardware.display.VirtualDisplay;
+import android.media.Image;
+import android.media.ImageReader;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.SystemClock;
+import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.accessibility.AccessibilityEvent;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -23,18 +43,37 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+import com.googlecode.tesseract.android.TessBaseAPI;
+
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import me.rotatingticket.yajd.dict.core.WordEntry;
+import me.rotatingticket.yajd.repository.FullTextTranslateRepository;
 import me.rotatingticket.yajd.service.ClipboardTranslationService;
+import me.rotatingticket.yajd.service.ScreenTranslationService;
 import me.rotatingticket.yajd.util.WordEntryAdapter;
 import me.rotatingticket.yajd.util.zinnia.Character;
 import me.rotatingticket.yajd.view.CandidateWordEntryView;
 import me.rotatingticket.yajd.view.CanvasView;
+import me.rotatingticket.yajd.view.FloatingWindow;
+import me.rotatingticket.yajd.viewmodel.FullTextTranslateActivityViewModel;
 import me.rotatingticket.yajd.viewmodel.MainActivityViewModel;
+import me.rotatingticket.yajd.webservice.BingTranslatorWebservice;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TESS_LANG = "jpn";
+    private static final String TESS_DATA_PATH = "tessdata/jpn.traineddata";
     private CardView candidatesCardView;
     private CanvasView canvasView;
     private RecyclerView handwritingCandidatesView;
@@ -45,6 +84,16 @@ public class MainActivity extends AppCompatActivity {
     private MainActivityViewModel viewModel;
     private Character handwritingCharacter;
     private HandwritingCandidatesAdapter handwritingCandidatesAdapter;
+    private WindowManager windowManager;
+    private FloatingWindow floatingView;
+    private TessBaseAPI tessBaseAPI;
+    private ImageReader imageReader;
+    private VirtualDisplay virtualDisplay;
+    private MediaProjectionManager mediaProjectionManager;
+    private static final int PROJECTION_REQUEST_CODE = 222;
+    private Thread thread;
+    private boolean processing;
+    private Handler mainHandler;
 
     private static class HandwritingCandidatesAdapter extends RecyclerView.Adapter {
 
@@ -101,6 +150,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mainHandler = new Handler(Looper.getMainLooper());
+
         setContentView(R.layout.activity_main);
 
         viewModel = ViewModelProviders.of(this).get(MainActivityViewModel.class);
@@ -405,5 +457,228 @@ public class MainActivity extends AppCompatActivity {
         jumpToTranslateBtn.setOnClickListener(
               view -> startActivity(new Intent(this, FullTextTranslateActivity.class))
         );
+
+        FloatingActionButton startScreenTranslateBtn = fabMenu.findViewById(R.id.btn_start_screen_translation);
+
+        mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+
+        startScreenTranslateBtn.setOnClickListener(view -> {
+            if (!Settings.canDrawOverlays(getApplicationContext())) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                intent.setData(Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent,1000);
+            } else {
+                Intent intent = mediaProjectionManager.createScreenCaptureIntent();
+                startActivityForResult(intent, PROJECTION_REQUEST_CODE);
+            }
+        });
+    }
+
+    private void prepareScreenTranslation() {
+        if (floatingView == null) {
+            createFloatingWindow();
+        }
+        if (ScreenTranslationService.getOnAccessibilityEventListener() == null) {
+            ScreenTranslationService.setOnAccessibilityEventListener(event -> {
+                Log.e("YAJD_S", String.format("%s %s %s %s", String.valueOf(event.getAction()), String.valueOf(floatingView), String.valueOf(floatingView != null && floatingView.isCapturing()), String.valueOf(event)));
+                if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && floatingView != null && floatingView.isCapturing()) {
+                    Log.e("YAJD_ASS", event.getPackageName().toString());
+                    try {
+                        startOcr(event.getEventTime());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.e("YAJD", event.getPackageName().toString());
+            });
+        }
+        Log.e("YAJD", String.valueOf(ScreenTranslationService.getOnAccessibilityEventListener()));
+    }
+
+    private void createFloatingWindow() {
+        floatingView = (FloatingWindow) getLayoutInflater().inflate(R.layout.floating_window, null, false);
+        floatingView.setOnLayoutParamsChangedListener((WindowManager.LayoutParams layoutParams) -> {
+            Log.e("YAJD_LAYOUTS", String.format("%d %d", layoutParams.x, layoutParams.y));
+            windowManager.updateViewLayout(floatingView, layoutParams);
+            floatingView.invalidate();
+        });
+
+        windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        assert windowManager != null;
+
+        int windowType = WindowManager.LayoutParams.TYPE_PHONE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            windowType = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        }
+        WindowManager.LayoutParams floatingLayoutParams = new WindowManager.LayoutParams(
+              600,
+              600,
+              0,
+              0,
+              windowType,
+              WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+              PixelFormat.RGBA_8888);
+        floatingLayoutParams.gravity = Gravity.LEFT | Gravity.TOP;
+        floatingView.setParam(floatingLayoutParams);
+        windowManager.addView(floatingView, floatingLayoutParams);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        prepareScreenTranslation();
+        prepareMediaProjection(resultCode, data);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+
+    private void prepareTesseract() throws IOException {
+        prepareTessData(this);
+        tessBaseAPI = new TessBaseAPI();
+        String tessLangPath = getFilesDir().getAbsolutePath();
+        tessBaseAPI.init(tessLangPath, TESS_LANG);
+    }
+
+    private void prepareTessData(@NonNull Context context) throws IOException {
+        File file = new File(context.getFilesDir(), TESS_DATA_PATH);
+        if (file.exists()) {
+            return;
+        }
+        initializeTessData(context);
+    }
+
+    private void initializeTessData(@NonNull Context context) throws IOException {
+        File folder = new File(context.getFilesDir(), "tessdata");
+        folder.mkdirs();
+        InputStream inputStream = context.getResources().openRawResource(R.raw.jpn);
+        File internalFile = new File(context.getFilesDir(), TESS_DATA_PATH);
+        OutputStream outputStream = new FileOutputStream(internalFile);
+        IOUtils.copy(inputStream, outputStream);
+    }
+
+    private void prepareMediaProjection(int resultCode, Intent resultData) {
+        Point displaySize = new Point();
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        assert windowManager != null;
+        windowManager.getDefaultDisplay().getRealSize(displaySize);
+
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+
+        mediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        assert mediaProjectionManager != null;
+        MediaProjection mediaProjection = mediaProjectionManager .getMediaProjection(resultCode, resultData);
+        imageReader = ImageReader.newInstance(displaySize.x, displaySize.y, PixelFormat.RGBA_8888, 2);
+        virtualDisplay = mediaProjection.createVirtualDisplay(
+              "SCREEN_CAPTURE_TRANSLATION",
+              displaySize.x,
+              displaySize.y,
+              displayMetrics.densityDpi,
+              DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+              imageReader.getSurface(),
+              null,
+              null);
+    }
+
+    private void startOcr(long timestamp) throws IOException {
+        if (processing) {
+            return;
+        }
+        processing = true;
+        Log.e("YAJD_OCR_TIME", String.format("%d %d %d", timestamp - SystemClock.uptimeMillis(), timestamp, SystemClock.uptimeMillis()));
+        if (SystemClock.uptimeMillis() - timestamp > 200) {
+            Log.e("YAJD_OCR", "SLOW EVENT");
+            return;
+        }
+
+        prepareTesseract();
+        Log.e("YAJD_OCR", "started");
+        if (imageReader == null) {
+            Log.e("YAJD_OCR", "NULL imageReader");
+            return;
+        }
+
+        int[] coordinate = new int[2];
+        floatingView.getLocationOnScreen(coordinate);
+        Log.e("YAJD_OCR", String.valueOf(coordinate));
+        windowManager.removeView(floatingView);
+        AsyncTask.execute(() -> {
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            String result;
+            try {
+                result = OCR(coordinate[0], coordinate[1]);
+                Log.e("YAJD_OCR", String.valueOf(result));
+                if (result != null && result.length() != 0) {
+                    Response<String> response = FullTextTranslateRepository
+                          .getInstance(getApplication())
+                          .getWebservice()
+                          .shortTranslate(result, "ja", "zh-cn")
+                          .execute();
+                    String translated = response.body();
+                    floatingView.setContent(translated);
+                    Log.e("YAJD_OCR", "CONTENT_SETTED");
+                }
+                Log.e("YAJD_OCR", "finished");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                mainHandler.post(() -> {
+                    windowManager.addView(floatingView, floatingView.getLayoutParams());
+                    processing = false;
+                });
+            }
+        });
+    }
+
+    private synchronized String OCR(int x, int y) {
+        Log.e("YAJD_OCR", "inner");
+        Image image = imageReader.acquireLatestImage();
+        if (image == null) {
+            Log.e("YAJD_OCR", "NULL image");
+            return null;
+        }
+        Bitmap fullscreen = imageToBitmap(image);
+        if (fullscreen == null) {
+            Log.e("YAJD_OCR", "NULL fullscreen");
+            return null;
+        }
+        Bitmap croped = Bitmap.createBitmap(fullscreen, x, y, floatingView.getWidth(), floatingView.getHeight());
+        if (croped == null) {
+            Log.e("YAJD_OCR", "CROPED null");
+            return null;
+        }
+        tessBaseAPI.setImage(croped);
+        return tessBaseAPI.getUTF8Text();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("YAJD_OCR", "DESTROIED");
+    }
+
+    private Bitmap imageToBitmap(Image image) throws OutOfMemoryError {
+        Image.Plane[] planes = image.getPlanes();
+        ByteBuffer buffer = planes[0].getBuffer();
+        int pixelStride = planes[0].getPixelStride();
+        int rowStride = planes[0].getRowStride();
+        int rowPadding = rowStride - pixelStride * image.getWidth();
+
+        Bitmap bitmap;
+        try {
+            bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
+        } catch (NullPointerException e) {
+            return null;
+        }
+        bitmap.copyPixelsFromBuffer(buffer);
+        image.close();
+
+        return bitmap;
     }
 }

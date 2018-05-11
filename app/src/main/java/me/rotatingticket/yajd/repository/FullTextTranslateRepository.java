@@ -33,6 +33,10 @@ public class FullTextTranslateRepository {
         return instance;
     }
 
+    public BingTranslatorWebservice getWebservice() {
+        return webservice;
+    }
+
     public LiveData<String> translate(String source) {
         MutableLiveData<String> result = new MutableLiveData<>();
         webservice.shortTranslate(source, LANG_SRC, LANG_DEST).enqueue(new Callback<String>() {
