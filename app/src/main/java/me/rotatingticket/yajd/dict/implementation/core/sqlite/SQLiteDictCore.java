@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import me.rotatingticket.yajd.dict.core.DictCore;
+import me.rotatingticket.yajd.dict.core.WordEntry;
 
 /**
  * The implementation of DictCore based on Room.
@@ -97,6 +98,36 @@ public abstract class SQLiteDictCore implements DictCore {
         return wordEntries;
     }
 
+    @Query("SELECT DISTINCT WordRecordId FROM WordFeature WHERE feature LIKE :feature" +
+           " ORDER BY feature LIMIT :limit")
+    protected abstract List<Integer> queryWordEntryIdsByLikeFeature(String feature, int limit);
+
+    @Query("SELECT DISTINCT WordRecordId FROM WordFeature WHERE feature = :feature" +
+          " ORDER BY feature LIMIT :limit")
+    protected abstract List<Integer> queryWordEntryIdsByFeature(String feature, int limit);
+
+    @Override
+    @Transaction
+    public List<? extends WordEntry> queryWordEntriesByPrefix(String prefix, int limit) {
+        String template = replaceLikePattern(prefix) + "%";
+        List<Integer> wordEntryIds =  queryWordEntryIdsByLikeFeature(template, limit);
+        List<SQLiteWordEntry> wordEntries = getWordEntriesByIds(wordEntryIds);
+
+        LongSparseArray<Integer> reverseMapper = new LongSparseArray<>(wordEntryIds.size());
+        for (int i = 0; i != wordEntryIds.size(); ++i) {
+            reverseMapper.put(wordEntryIds.get(i), i);
+        }
+
+        wordEntries.sort(Comparator.comparingLong(o -> reverseMapper.get(o.getWordRecordId())));
+        return wordEntries;
+    }
+
+    @Override
+    public List<? extends WordEntry> queryWordEntries(String query, int limit) {
+        List<Integer> wordEntryIds = queryWordEntryIdsByFeature(query, limit);
+        return getWordEntriesByIds(wordEntryIds);
+    }
+
     @VisibleForTesting
     @Insert
     public abstract long insertWordRecord(SQLiteWordRecord records);
@@ -117,12 +148,22 @@ public abstract class SQLiteDictCore implements DictCore {
     public void insertAll(List<SQLiteWordEntry> entries) {
         for (SQLiteWordEntry entry : entries) {
             long wordRecordId = insertWordRecord(entry.wordRecord);
+
             for (SQLiteWordRomaji romaji : entry.wordRomajis) {
                 romaji.setWordRecordId(wordRecordId);
             }
             insertAllWordRomajis(entry.wordRomajis);
+
+            for (SQLiteWordFeature feature : entry.wordFeatures) {
+                feature.setWordRecordId(wordRecordId);
+            }
+            insertAllWordFeatures(entry.wordFeatures);
         }
     }
+
+    @VisibleForTesting
+    @Insert
+    public abstract void insertAllWordFeatures(List<SQLiteWordFeature> features);
 
     @VisibleForTesting
     public void insert(SQLiteWordEntry entries) {

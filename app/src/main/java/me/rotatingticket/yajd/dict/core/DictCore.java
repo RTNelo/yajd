@@ -56,4 +56,20 @@ public interface DictCore {
      * @return a list of result word entries, ordered by matching romaji. .size() is lte to limit.
      */
     List<? extends WordEntry> getWordEntriesByRomajiPrefix(String romajiPrefix, int limit);
+
+    /**
+     * Get a list of word entries by query feature prefix.
+     * @param prefix The prefix to query.
+     * @param limit The result size limit.
+     * @return A list of WordEntry.
+     */
+    List<? extends WordEntry> queryWordEntriesByPrefix(String prefix, int limit);
+
+    /**
+     * Get a list of word entries by query feature.
+     * @param query The target query.
+     * @param limit The result size limit.
+     * @return A list of WordEntry.
+     */
+    List<? extends WordEntry> queryWordEntries(String query, int limit);
 }

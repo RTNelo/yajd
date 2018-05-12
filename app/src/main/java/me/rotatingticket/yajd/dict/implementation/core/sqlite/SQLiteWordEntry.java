@@ -28,26 +28,56 @@ public class SQLiteWordEntry extends WordEntry {
     @Relation(parentColumn = "id", entityColumn = "wordRecordId", entity = SQLiteWordRomaji.class)
     public List<SQLiteWordRomaji> wordRomajis;
 
+    /**
+     * A list of entities of word feature records in the SQLite database.
+     */
+    @Relation(parentColumn = "id", entityColumn = "wordRecordId", entity = SQLiteWordFeature.class)
+    public List<SQLiteWordFeature> wordFeatures;
+
     public SQLiteWordEntry() {
     }
 
-    public SQLiteWordEntry(SQLiteWordRecord wordRecord, List<SQLiteWordRomaji> wordRomajis) {
+    public SQLiteWordEntry(SQLiteWordRecord wordRecord,
+                           List<SQLiteWordRomaji> wordRomajis,
+                           List<SQLiteWordFeature> wordFeatures) {
         this.wordRecord = wordRecord;
         this.wordRomajis = wordRomajis;
+        this.wordFeatures = wordFeatures;
     }
 
     public static SQLiteWordEntry construct(String word, String romaji, String description) {
         ArrayList<SQLiteWordRomaji> wordRomajis = new ArrayList<>(1);
         wordRomajis.add(new SQLiteWordRomaji(romaji));
-        return new SQLiteWordEntry(new SQLiteWordRecord(word, description), wordRomajis);
+
+        ArrayList<SQLiteWordFeature> wordFeatures = new ArrayList<>(2);
+        wordFeatures.add(new SQLiteWordFeature(word));
+        wordFeatures.add(new SQLiteWordFeature(romaji));
+
+        return new SQLiteWordEntry(
+              new SQLiteWordRecord(word, description),
+              wordRomajis,
+              wordFeatures);
     }
 
-    public static SQLiteWordEntry construct(String word, String[] romajis, String description) {
+    public static SQLiteWordEntry construct(String word,
+                                            String[] romajis,
+                                            String description,
+                                            String[] features) {
         ArrayList<SQLiteWordRomaji> wordRomajis = new ArrayList<>(romajis.length);
         for (String romaji : romajis) {
             wordRomajis.add(new SQLiteWordRomaji(romaji));
         }
-        return new SQLiteWordEntry(new SQLiteWordRecord(word, description), wordRomajis);
+
+        ArrayList<SQLiteWordFeature> wordFeatures = new ArrayList<>(features.length);
+        for (String feature : features) {
+            wordFeatures.add(new SQLiteWordFeature(feature));
+        }
+
+        return new SQLiteWordEntry(
+              new SQLiteWordRecord(word, description),
+              wordRomajis,
+              wordFeatures
+        );
     }
 
     @Override

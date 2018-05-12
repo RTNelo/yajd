@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.rotatingticket.yajd.MockitoTestCase;
@@ -27,28 +28,33 @@ class BasicDictTest extends MockitoTestCase {
     @Test
     void testWordUserQuery() {
         String query = "今日";
-        int limit = 10;
 
-        // TODO(rtnelo@yeah.net): prettier approach?
-        List<? extends WordEntry> stub = dictCore.getWordEntriesByWordPrefix(query, limit);
-        reset(dictCore);
-
-
-        assertEquals(stub, dict.userQuerySuggestion(query, limit));
-        verify(dictCore).getWordEntriesByWordPrefix(query, limit);
+        assertEquals(new ArrayList<>(0), dict.userQuery(query));
+        verify(dictCore).getWordEntryByWord(query);
     }
 
     @Test
     void testRomajiUserQuery() {
         String query = "kyo";
-        int limit = 10;
 
         // TODO(rtnelo@yeah.net): prettier approach?
-        List<? extends WordEntry> stub = dictCore.getWordEntriesByRomajiPrefix(query, limit);
+        List<? extends WordEntry> stub = dictCore.getWordEntriesByRomaji(query);
         reset(dictCore);
 
 
+        assertEquals(stub, dict.userQuery(query));
+        verify(dictCore).getWordEntriesByRomaji(query);
+    }
+
+    @Test
+    void userQuerySuggestion() {
+        String query = "kyo";
+        int limit = 10;
+
+        List<? extends WordEntry> stub = dictCore.queryWordEntriesByPrefix(query, limit);
+        reset(dictCore);
+
         assertEquals(stub, dict.userQuerySuggestion(query, limit));
-        verify(dictCore).getWordEntriesByRomajiPrefix(query, limit);
+        verify(dictCore).queryWordEntriesByPrefix(query, limit);
     }
 }

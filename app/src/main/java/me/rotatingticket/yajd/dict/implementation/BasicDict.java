@@ -29,11 +29,7 @@ public class BasicDict implements Dict {
      */
     @Override
     public List<? extends WordEntry> userQuerySuggestion(String input, int limit) {
-        if (mayBeRomaji(input)) {
-            return dictCore.getWordEntriesByRomajiPrefix(input, limit);
-        } else {
-            return dictCore.getWordEntriesByWordPrefix(input, limit);
-        }
+        return dictCore.queryWordEntriesByPrefix(input, limit);
     }
 
     /**

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "44b8ce621ec2e13415372f5d7e08d239",
+    "identityHash": "639fda454292970b77206856cce9e087",
     "entities": [
       {
         "tableName": "WordRecord",
@@ -97,11 +97,72 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "WordFeature",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature` TEXT, `wordRecordId` INTEGER NOT NULL, FOREIGN KEY(`wordRecordId`) REFERENCES `WordRecord`(`id`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "feature",
+            "columnName": "feature",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "wordRecordId",
+            "columnName": "wordRecordId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_WordFeature_feature",
+            "unique": false,
+            "columnNames": [
+              "feature"
+            ],
+            "createSql": "CREATE  INDEX `index_WordFeature_feature` ON `${TABLE_NAME}` (`feature`)"
+          },
+          {
+            "name": "index_WordFeature_wordRecordId",
+            "unique": false,
+            "columnNames": [
+              "wordRecordId"
+            ],
+            "createSql": "CREATE  INDEX `index_WordFeature_wordRecordId` ON `${TABLE_NAME}` (`wordRecordId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "WordRecord",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "wordRecordId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"44b8ce621ec2e13415372f5d7e08d239\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"639fda454292970b77206856cce9e087\")"
     ]
   }
 }
