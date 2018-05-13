@@ -17,6 +17,7 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
 public class CandidateWordEntryView extends LinearLayout implements WordEntryView {
     private TextView wordView;
     private TextView pronunciationView;
+    private TextView summaryView;
 
     public CandidateWordEntryView(Context context) {
         this(context, null);
@@ -42,6 +43,7 @@ public class CandidateWordEntryView extends LinearLayout implements WordEntryVie
         inflate(getContext(), R.layout.search_candidate_view, this);
         wordView = findViewById(R.id.word);
         pronunciationView = findViewById(R.id.pronunciation);
+        summaryView = findViewById(R.id.summary);
     }
 
     /**
@@ -52,6 +54,7 @@ public class CandidateWordEntryView extends LinearLayout implements WordEntryVie
         wordView.setText(wordEntry.getWord());
         String pronunciation = StringUtils.join(wordEntry.getRomajis(), ", ");
         pronunciationView.setText(pronunciation);
+        summaryView.setText(wordEntry.getSummary());
     }
 
     /**

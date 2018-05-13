@@ -17,6 +17,14 @@ public interface DictCore {
     @Nullable WordEntry getWordEntryByWord(String word);
 
     /**
+     * Get the word entry by word and the frequency should be lower than the ubound.
+     * @param word The target word.
+     * @param frequencyUpBound The frequency up bound.
+     * @return The corresponding word entry, or null if word not found or word frequency is higher than up bound.
+     */
+    @Nullable WordEntry getWordEntryByWordAndFrequency(String word, int frequencyUpBound);
+
+    /**
      * Get a list of word entry which have a romaji matching the param precisely.
      * @param romaji target romaji.
      * @return list of the target word entry, ordered by matching romaji.

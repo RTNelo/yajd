@@ -18,11 +18,16 @@ public class SQLiteWordRecord {
 
     @ColumnInfo(index = true)
     private String word;
+    private int frequency;
+    @ColumnInfo(typeAffinity = ColumnInfo.TEXT)
+    private String summary;
     @ColumnInfo(typeAffinity = ColumnInfo.TEXT)
     private String description;
 
-    public SQLiteWordRecord(String word, String description) {
+    public SQLiteWordRecord(String word, int frequency, String summary, String description)  {
         this.word = word;
+        this.frequency = frequency;
+        this.summary = summary;
         this.description = description;
     }
 
@@ -75,5 +80,21 @@ public class SQLiteWordRecord {
               ", word='" + word + '\'' +
               ", description='" + description + '\'' +
               '}';
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
     }
 }

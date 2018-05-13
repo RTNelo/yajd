@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +17,15 @@ import me.rotatingticket.yajd.viewmodel.FullTextTranslateActivityViewModel;
 
 public class FullTextTranslateActivity extends AppCompatActivity {
 
+    private static final int MAX_LEVEL = 100;
+
     private FullTextTranslateActivityViewModel viewModel;
 
     private EditText srcEditText;
     private TextView destEditText;
     private FloatingActionButton  translateBtn;
+    private TextView levelView;
+    private SeekBar levelSeekbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,16 +59,56 @@ public class FullTextTranslateActivity extends AppCompatActivity {
         viewModel.getNetworkNotification().observe(this, notification -> {
             Toast.makeText(this, notification, Toast.LENGTH_SHORT).show();
         });
+
+        levelSeekbar = findViewById(R.id.seek_bar_level);
+        levelView = findViewById(R.id.view_level);
+
+        levelSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                viewModel.setLevel(progress);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        viewModel.getLevel().observe(this, level -> {
+            if (level == null) {
+                return;
+            }
+            if (level != MAX_LEVEL) {
+                levelView.setText(String.format("%d%%", level));
+            } else {
+                levelView.setText(R.string.level_full_text_translation);
+            }
+        });
     }
 
     public void translate(View view) {
         setTranslatingState(true);
-        viewModel.translate(srcEditText.getText().toString()).observe(this, result -> {
-            if (result != null) {
-                destEditText.setText(result);
-            }
-            setTranslatingState(false);
-        });
+        int level = levelSeekbar.getProgress();
+        String text = srcEditText.getText().toString();
+
+        if (level == MAX_LEVEL) {
+            viewModel.translate(text).observe(this, this::setResult);
+        } else {
+            viewModel.translateByOccurency(text, level).observe(this, this::setResult);
+        }
+    }
+
+    private void setResult(String result) {
+        if (result != null) {
+            destEditText.setText(result);
+        }
+        setTranslatingState(false);
     }
 
     /**

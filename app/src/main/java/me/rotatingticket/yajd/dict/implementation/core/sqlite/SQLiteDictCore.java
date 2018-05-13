@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Transaction;
+import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.LongSparseArray;
 
@@ -26,6 +27,11 @@ public abstract class SQLiteDictCore implements DictCore {
     @Transaction
     @Query("SELECT * FROM WordRecord WHERE word = :word")
     public abstract SQLiteWordEntry getWordEntryByWord(String word);
+
+    @Nullable
+    @Override
+    @Query("SELECT * FROM WordRecord WHERE word = :word AND frequency <= :frequencyUpBound")
+    public abstract SQLiteWordEntry getWordEntryByWordAndFrequency(String word, int frequencyUpBound);
 
     @Transaction
     @Query("SELECT * FROM WordRecord WHERE id IN (:ids)")

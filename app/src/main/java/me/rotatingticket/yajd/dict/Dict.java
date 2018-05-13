@@ -33,4 +33,12 @@ public interface Dict {
      * @return The result word, or null if word not found.
      */
     WordEntry userView(String word);
+
+    /**
+     * Look up the target word directly for user view and the word frequency should be lower than the ubound.
+     * @param word The target word.
+     * @param frequencyUpBound The frequency up bound.
+     * @return The target word, or null if word not found or word frequency is higher than up bound.
+     */
+    WordEntry userViewByFrequency(String word, int frequencyUpBound);
 }

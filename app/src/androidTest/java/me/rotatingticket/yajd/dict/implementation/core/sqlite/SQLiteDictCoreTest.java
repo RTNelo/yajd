@@ -44,7 +44,7 @@ public class SQLiteDictCoreTest {
 
     @Test
     public void getWordEntryByWord() {
-        SQLiteWordEntry entry = SQLiteWordEntry.construct("今日は", "konnichiha", "説明");
+        SQLiteWordEntry entry = SQLiteWordEntry.construct("今日は", 1, "konnichiha", "説明");
         coreDict.insert(entry);
         SQLiteWordEntry actual = coreDict.getWordEntryByWord("今日は");
         assertEquals(entry, actual);
@@ -62,6 +62,7 @@ public class SQLiteDictCoreTest {
         // Test multiple romajis
         SQLiteWordEntry entry2 = SQLiteWordEntry.construct(
               "今日",
+              2,
               new String[]{"kyo", "konjitsu"},
               "説明",
               new String[]{"今日", "kyo", "konjitsu"}
@@ -74,6 +75,9 @@ public class SQLiteDictCoreTest {
         romajis2.add("kyo");
         romajis2.add("konjitsu");
         assertEquals(romajis2, actual2.getRomajis());
+
+        assertEquals(entry2, coreDict.getWordEntryByWordAndFrequency("今日", 2));
+        assertNull(coreDict.getWordEntryByWordAndFrequency("今日", 1));
     }
 
     @Test

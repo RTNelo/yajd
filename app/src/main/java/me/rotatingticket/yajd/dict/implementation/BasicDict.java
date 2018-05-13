@@ -64,6 +64,17 @@ public class BasicDict implements Dict {
     }
 
     /**
+     * Look up the target word directly for user view and the word frequency should be lower than the ubound.
+     * @param word The target word.
+     * @param frequencyUpBound The frequency up bound.
+     * @return The target word, or null if word not found or word frequency is higher than up bound.
+     */
+    @Override
+    public WordEntry userViewByFrequency(String word, int frequencyUpBound) {
+        return dictCore.getWordEntryByWordAndFrequency(word, frequencyUpBound);
+    }
+
+    /**
      * Determine whether the input may be romajis.
      *
      * @param input The user input.

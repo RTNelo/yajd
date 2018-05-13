@@ -26,4 +26,11 @@ public abstract class WordEntry {
      * @return the description string of the word.
      */
     public abstract String getDescription();
+
+    /**
+     * Get the summary of the word.
+     * The summary show as short as possible to be used in translation by frequency.
+     * @return the summary string of the word.
+     */
+    public abstract String getSummary();
 }
