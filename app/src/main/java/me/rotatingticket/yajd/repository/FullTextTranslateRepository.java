@@ -136,6 +136,8 @@ public class FullTextTranslateRepository {
                                     resultBuilder.append(baseForm);
                                     resultBuilder.append(": ");
                                 }
+                                resultBuilder.append(queryResult.getRomajisInOneline());
+                                resultBuilder.append(" | ");
                                 resultBuilder.append(queryResult.getSummary());
                                 resultBuilder.append(")");
                             }
