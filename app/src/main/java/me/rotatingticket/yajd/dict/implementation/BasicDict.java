@@ -1,5 +1,8 @@
 package me.rotatingticket.yajd.dict.implementation;
 
+import com.swabunga.spell.engine.Word;
+import com.swabunga.spell.event.SpellChecker;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -14,22 +17,30 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
  */
 public class BasicDict implements Dict {
     private DictCore dictCore;
+    private SpellChecker spellChecker;
 
-    public BasicDict(DictCore dictCore) {
+    public BasicDict(DictCore dictCore, SpellChecker spellChecker) {
         this.dictCore = dictCore;
+        this.spellChecker = spellChecker;
     }
 
     /**
      * Look up in the dictCore for query suggestions.
-     * If the input is romaji (see mayBeRomaji), get words by romaji prefix.
-     * Otherwise, get words by word prefix.
+     * First, Get word by prefix, or spell checker suggestion.
      * @param input The user input string, may romajis, kanas or kanjis.
      * @param limit The result list size limitation.
      * @return The words corresponding to the user's input.
      */
     @Override
     public List<? extends WordEntry> userQuerySuggestion(String input, int limit) {
-        return dictCore.queryWordEntriesByPrefix(input, limit);
+        List<? extends WordEntry> result = dictCore.queryWordEntriesByPrefix(input, limit);
+        if (result.size() == 0 && mayBeRomaji(input)) {
+            List<Word> suggestions = (List<Word>) spellChecker.getSuggestions(input, 1);
+            if (suggestions.size() != 0) {
+                return dictCore.queryWordEntriesByPrefix(suggestions.get(0).getWord(), limit);
+            }
+        }
+        return result;
     }
 
     /**

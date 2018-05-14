@@ -14,6 +14,7 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
 import me.rotatingticket.yajd.dict.implementation.BasicDict;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictCore;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictDatabase;
+import me.rotatingticket.yajd.util.SpellCheckerManager;
 
 /**
  * View model for look up result activity.
@@ -26,7 +27,7 @@ public class LookUpResultActivityViewModel extends AndroidViewModel {
     public LookUpResultActivityViewModel(@NonNull Application application) {
         super(application);
         SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(application).getSQLiteCoreDict();
-        dict = new BasicDict(dictCore);
+        dict = new BasicDict(dictCore, SpellCheckerManager.getInstance(application));
     }
 
     public MutableLiveData<List<? extends WordEntry>> getLookUpResults() {
