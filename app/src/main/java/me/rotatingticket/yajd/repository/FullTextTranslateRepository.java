@@ -18,6 +18,7 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
 import me.rotatingticket.yajd.dict.implementation.BasicDict;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictCore;
 import me.rotatingticket.yajd.dict.implementation.core.sqlite.SQLiteDictDatabase;
+import me.rotatingticket.yajd.util.SpellCheckerManager;
 import me.rotatingticket.yajd.util.TokenizerManager;
 import me.rotatingticket.yajd.webservice.BingTranslatorWebservice;
 import me.rotatingticket.yajd.webservice.WebserviceManager;
@@ -67,7 +68,9 @@ public class FullTextTranslateRepository {
      */
     private static Dict prepareDict(@NonNull Context context) {
         SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(context).getSQLiteCoreDict();
-        return new BasicDict(dictCore);
+        return new BasicDict(dictCore,
+              SpellCheckerManager.getInstance(context),
+              TokenizerManager.getInstance());
     }
 
     public BingTranslatorWebservice getWebservice() {

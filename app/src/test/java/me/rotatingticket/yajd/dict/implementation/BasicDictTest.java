@@ -1,5 +1,8 @@
 package me.rotatingticket.yajd.dict.implementation;
 
+import com.swabunga.spell.event.SpellChecker;
+
+import org.atilika.kuromoji.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -18,11 +21,15 @@ import static org.mockito.Mockito.verify;
 class BasicDictTest extends MockitoTestCase {
     @Mock
     private DictCore dictCore;
+    @Mock
+    private SpellChecker spellChecker;
+    @Mock
+    private Tokenizer tokenizer;
     private BasicDict dict;
 
     @BeforeEach
     void setupDict() {
-        dict = new BasicDict(dictCore);
+        dict = new BasicDict(dictCore, spellChecker, tokenizer);
     }
 
     @Test
