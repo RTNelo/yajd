@@ -1,11 +1,15 @@
 package me.rotatingticket.yajd.dict.core;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 /**
  * The interface of a word in the dictionary.
  */
 public abstract class WordEntry {
+    public static final String DEFAULT_ROMAJIS_SEPARATOR = "; ";
+
     /**
      * Get the String of the kanji or kana of the word.
      * If the word is こんにちは, this method should return String "こんにちは".
@@ -33,4 +37,17 @@ public abstract class WordEntry {
      * @return the summary string of the word.
      */
     public abstract String getSummary();
+
+
+    /**
+     * Get the romajis representing in one line;
+     * @return The romajis in one line;
+     */
+    public String getRomajisInOneline() {
+        return getRomajisInOneline(DEFAULT_ROMAJIS_SEPARATOR);
+    };
+
+    public String getRomajisInOneline(String separator) {
+        return StringUtils.join(getRomajis(), separator);
+    }
 }

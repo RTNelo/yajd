@@ -17,8 +17,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
@@ -90,7 +88,7 @@ public class ClipboardTranslationService extends BaseForegroundService {
         for (WordEntry wordEntry : wordEntries) {
             printWriter.print(wordEntry.getWord());
             printWriter.print(" ");
-            printWriter.println(StringUtils.join(wordEntry.getRomajis(), "; "));
+            printWriter.println(wordEntry.getRomajisInOneline());
             printWriter.println(wordEntry.getDescription());
             printWriter.println();
         }

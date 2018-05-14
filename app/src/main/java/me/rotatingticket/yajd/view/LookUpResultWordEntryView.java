@@ -7,8 +7,6 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import org.apache.commons.lang3.StringUtils;
-
 import me.rotatingticket.yajd.R;
 import me.rotatingticket.yajd.dict.core.WordEntry;
 
@@ -43,7 +41,7 @@ public class LookUpResultWordEntryView extends FrameLayout implements WordEntryV
 
     private void fillByWordEntry(WordEntry wordEntry) {
         wordView.setText(wordEntry.getWord());
-        String pronunciation = StringUtils.join(wordEntry.getRomajis(), "; ");
+        String pronunciation = wordEntry.getRomajisInOneline();
         pronunciationView.setText(pronunciation);
         descriptionView.setText(wordEntry.getDescription());
     }
