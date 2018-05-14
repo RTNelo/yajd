@@ -68,7 +68,9 @@ public class FullTextTranslateRepository {
      */
     private static Dict prepareDict(@NonNull Context context) {
         SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(context).getSQLiteCoreDict();
-        return new BasicDict(dictCore, SpellCheckerManager.getInstance(context));
+        return new BasicDict(dictCore,
+              SpellCheckerManager.getInstance(context),
+              TokenizerManager.getInstance());
     }
 
     public BingTranslatorWebservice getWebservice() {

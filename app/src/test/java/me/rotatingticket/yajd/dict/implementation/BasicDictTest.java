@@ -2,6 +2,7 @@ package me.rotatingticket.yajd.dict.implementation;
 
 import com.swabunga.spell.event.SpellChecker;
 
+import org.atilika.kuromoji.Tokenizer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -22,11 +23,13 @@ class BasicDictTest extends MockitoTestCase {
     private DictCore dictCore;
     @Mock
     private SpellChecker spellChecker;
+    @Mock
+    private Tokenizer tokenizer;
     private BasicDict dict;
 
     @BeforeEach
     void setupDict() {
-        dict = new BasicDict(dictCore, spellChecker);
+        dict = new BasicDict(dictCore, spellChecker, tokenizer);
     }
 
     @Test

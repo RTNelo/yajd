@@ -4,6 +4,8 @@ import com.swabunga.spell.engine.Word;
 import com.swabunga.spell.event.SpellChecker;
 
 import org.apache.commons.lang3.StringUtils;
+import org.atilika.kuromoji.Token;
+import org.atilika.kuromoji.Tokenizer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,15 +20,17 @@ import me.rotatingticket.yajd.dict.core.WordEntry;
 public class BasicDict implements Dict {
     private DictCore dictCore;
     private SpellChecker spellChecker;
+    private Tokenizer tokenizer;
 
-    public BasicDict(DictCore dictCore, SpellChecker spellChecker) {
+    public BasicDict(DictCore dictCore, SpellChecker spellChecker, Tokenizer tokenizer) {
         this.dictCore = dictCore;
         this.spellChecker = spellChecker;
+        this.tokenizer = tokenizer;
     }
 
     /**
      * Look up in the dictCore for query suggestions.
-     * First, Get word by prefix, or spell checker suggestion.
+     * First, Get word by prefix, spell checker suggestion or word base form.
      * @param input The user input string, may romajis, kanas or kanjis.
      * @param limit The result list size limitation.
      * @return The words corresponding to the user's input.
@@ -34,10 +38,22 @@ public class BasicDict implements Dict {
     @Override
     public List<? extends WordEntry> userQuerySuggestion(String input, int limit) {
         List<? extends WordEntry> result = dictCore.queryWordEntriesByPrefix(input, limit);
-        if (result.size() == 0 && mayBeRomaji(input)) {
-            List<Word> suggestions = (List<Word>) spellChecker.getSuggestions(input, 1);
-            if (suggestions.size() != 0) {
-                return dictCore.queryWordEntriesByPrefix(suggestions.get(0).getWord(), limit);
+        // only run extra logic on empty result
+        if (result.size() == 0) {
+            if (mayBeRomaji(input)) {
+                // try use spell checker if it is all romajis.
+                List<Word> suggestions = (List<Word>) spellChecker.getSuggestions(input, 1);
+                if (suggestions.size() != 0) {
+                    return dictCore.queryWordEntriesByPrefix(suggestions.get(0).getWord(), limit);
+                }
+            } else {
+                // try use base form if it is not all romajis.
+                List<Token> tokens = tokenizer.tokenize(input);
+                if (tokens.size() != 0
+                      && tokens.get(0).getBaseForm() != null
+                      && !input.equals(tokens.get(0).getBaseForm())) {
+                    result = dictCore.queryWordEntriesByPrefix(tokens.get(0).getBaseForm(), limit);
+                }
             }
         }
         return result;
