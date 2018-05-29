@@ -42,9 +42,13 @@ public class BasicDict implements Dict {
         if (result.size() == 0) {
             if (mayBeRomaji(input)) {
                 // try use spell checker if it is all romajis.
-                List<Word> suggestions = (List<Word>) spellChecker.getSuggestions(input, 1);
-                if (suggestions.size() != 0) {
-                    return dictCore.queryWordEntriesByPrefix(suggestions.get(0).getWord(), limit);
+                try {
+                    List<Word> suggestions = (List<Word>) spellChecker.getSuggestions(input, 1);
+                    if (suggestions.size() != 0) {
+                        return dictCore.queryWordEntriesByPrefix(suggestions.get(0).getWord(), limit);
+                    }
+                } catch (Exception e) {
+                    // do nothing if get suggestions failed
                 }
             } else {
                 // try use base form if it is not all romajis.
