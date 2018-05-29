@@ -25,7 +25,7 @@ public abstract class SQLiteDictDatabase extends RoomDatabase {
     private static SQLiteDictDatabase instance;
     private static final String DB_NAME = "DictCore.db";
 
-    abstract public SQLiteDictCore getSQLiteCoreDict();
+    abstract public SQLiteDictCore getSQLiteDictCore();
 
     public static synchronized SQLiteDictDatabase getInstance(Context context) {
         if (instance == null) {

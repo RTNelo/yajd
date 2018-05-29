@@ -27,7 +27,7 @@ public class LookUpResultActivityViewModel extends AndroidViewModel {
 
     public LookUpResultActivityViewModel(@NonNull Application application) {
         super(application);
-        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(application).getSQLiteCoreDict();
+        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(application).getSQLiteDictCore();
         dict = new BasicDict(dictCore,
               SpellCheckerManager.getInstance(application),
               TokenizerManager.getInstance());

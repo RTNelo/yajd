@@ -14,18 +14,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import me.rotatingticket.yajd.dict.core.WordEntry;
-
 import static org.junit.Assert.*;
 
 public class SQLiteDictCoreTest {
-    private SQLiteDictCore coreDict;
+    private SQLiteDictCore dictCore;
     private SQLiteDictDatabase db;
 
     private void createDb() {
         Context context = InstrumentationRegistry.getTargetContext();
         db = Room.inMemoryDatabaseBuilder(context, SQLiteDictDatabase.class).build();
-        coreDict = db.getSQLiteCoreDict();
+        dictCore = db.getSQLiteDictCore();
     }
 
     private void closeDb() {
@@ -45,8 +43,8 @@ public class SQLiteDictCoreTest {
     @Test
     public void getWordEntryByWord() {
         SQLiteWordEntry entry = SQLiteWordEntry.construct("今日は", 1, "konnichiha", "説明");
-        coreDict.insert(entry);
-        SQLiteWordEntry actual = coreDict.getWordEntryByWord("今日は");
+        dictCore.insert(entry);
+        SQLiteWordEntry actual = dictCore.getWordEntryByWord("今日は");
         assertEquals(entry, actual);
 
         ArrayList<String> romajis = new ArrayList<>(1);
@@ -54,10 +52,10 @@ public class SQLiteDictCoreTest {
         assertEquals(romajis, actual.getRomajis());
 
         // DictCore doesn't support spell correction
-        assertNull(coreDict.getWordEntryByWord("こんにちわ"));
+        assertNull(dictCore.getWordEntryByWord("こんにちわ"));
 
         // DictCore doesn't support translating kana to romaji
-        assertNull(coreDict.getWordEntryByWord("こんにちは"));
+        assertNull(dictCore.getWordEntryByWord("こんにちは"));
 
         // Test multiple romajis
         SQLiteWordEntry entry2 = SQLiteWordEntry.construct(
@@ -67,8 +65,8 @@ public class SQLiteDictCoreTest {
               "説明",
               new String[]{"今日", "kyo", "konjitsu"}
         );
-        coreDict.insert(entry2);
-        SQLiteWordEntry actual2 = coreDict.getWordEntryByWord("今日");
+        dictCore.insert(entry2);
+        SQLiteWordEntry actual2 = dictCore.getWordEntryByWord("今日");
         assertEquals(entry2, actual2);
 
         ArrayList<String> romajis2 = new ArrayList<>(2);
@@ -76,8 +74,8 @@ public class SQLiteDictCoreTest {
         romajis2.add("konjitsu");
         assertEquals(romajis2, actual2.getRomajis());
 
-        assertEquals(entry2, coreDict.getWordEntryByWordAndFrequency("今日", 2));
-        assertNull(coreDict.getWordEntryByWordAndFrequency("今日", 1));
+        assertEquals(entry2, dictCore.getWordEntryByWordAndFrequency("今日", 2));
+        assertNull(dictCore.getWordEntryByWordAndFrequency("今日", 1));
     }
 
     @Test
@@ -87,14 +85,14 @@ public class SQLiteDictCoreTest {
         entries.add(SQLiteWordEntry.construct("ひ", "hi", "「ひ」の説明"));
         entries.add(SQLiteWordEntry.construct("おはよう", "ohayou", "「おはよう」の説明"));
         entries.add(SQLiteWordEntry.construct("こんばんは", "konbanha", "「こんばんは」の説明"));
-        coreDict.insertAll(entries);
-        assertCollectionEquals(entries.subList(0, 2), coreDict.getWordEntriesByRomaji("hi"));
+        dictCore.insertAll(entries);
+        assertCollectionEquals(entries.subList(0, 2), dictCore.getWordEntriesByRomaji("hi"));
 
         // DictCore doesn't support spell correction
-        assertEquals(0, coreDict.getWordEntriesByRomaji("konnichiwa").size());
+        assertEquals(0, dictCore.getWordEntriesByRomaji("konnichiwa").size());
 
         // or romaji normalization
-        assertEquals(0, coreDict.getWordEntriesByRomaji("konniqiha").size());
+        assertEquals(0, dictCore.getWordEntriesByRomaji("konniqiha").size());
     }
 
     @Test
@@ -104,14 +102,14 @@ public class SQLiteDictCoreTest {
         entries.add(SQLiteWordEntry.construct("おはよう", "ohayou", "「おはよう」の説明"));
         entries.add(SQLiteWordEntry.construct("こんばんは", "konbanha", "「こんばんは」の説明"));
 
-        coreDict.insertAll(entries);
+        dictCore.insertAll(entries);
 
         ArrayList<String> words = new ArrayList<>();
         words.add("今日は");
         words.add("おはよう");
         words.add("見つけない");
 
-        Map<String, SQLiteWordEntry> actual = coreDict.getWordEntriesByWords(words);
+        Map<String, SQLiteWordEntry> actual = dictCore.getWordEntriesByWords(words);
         assertEquals(2, actual.size());
         assertEquals(entries.get(0), actual.get(words.get(0)));
         assertEquals(entries.get(1), actual.get(words.get(1)));
@@ -124,14 +122,14 @@ public class SQLiteDictCoreTest {
         entries.add(SQLiteWordEntry.construct("おはよう", "ohayou", "「おはよう」の説明"));
         entries.add(SQLiteWordEntry.construct("こんばんは", "konbanha", "「こんばんは」の説明"));
 
-        coreDict.insertAll(entries);
+        dictCore.insertAll(entries);
 
         ArrayList<String> romajis = new ArrayList<>();
         romajis.add("hi");
         romajis.add("ohayou");
         romajis.add("mitsukenai");
 
-        Map<String, List<SQLiteWordEntry>> actual = coreDict.getWordEntriesByRomajis(romajis);
+        Map<String, List<SQLiteWordEntry>> actual = dictCore.getWordEntriesByRomajis(romajis);
         assertEquals(3,actual.size());
         assertEquals(2, actual.get(romajis.get(0)).size());
         assertEquals(1, actual.get(romajis.get(1)).size());
@@ -155,19 +153,19 @@ public class SQLiteDictCoreTest {
         entries.add(SQLiteWordEntry.construct("おはよう", "ohayou", "「おはよう」の説明"));
         entries.add(SQLiteWordEntry.construct("こんばんは", "konbanha", "「こんばんは」の説明"));
 
-        coreDict.insertAll(entries);
+        dictCore.insertAll(entries);
 
         // multi results
-        assertEquals(entries.subList(0, 2), coreDict.getWordEntriesByWordPrefix("今", 2));
-        assertEquals(entries.subList(0, 3), coreDict.getWordEntriesByWordPrefix("今", 3));
-        assertEquals(entries.subList(0, 3), coreDict.getWordEntriesByWordPrefix("今", 5));
-        assertEquals(entries.subList(1, 3), coreDict.getWordEntriesByWordPrefix("今日", 5));
+        assertEquals(entries.subList(0, 2), dictCore.getWordEntriesByWordPrefix("今", 2));
+        assertEquals(entries.subList(0, 3), dictCore.getWordEntriesByWordPrefix("今", 3));
+        assertEquals(entries.subList(0, 3), dictCore.getWordEntriesByWordPrefix("今", 5));
+        assertEquals(entries.subList(1, 3), dictCore.getWordEntriesByWordPrefix("今日", 5));
 
         // only one result
-        assertEquals(entries.subList(3, 4), coreDict.getWordEntriesByWordPrefix("お", 5));
+        assertEquals(entries.subList(3, 4), dictCore.getWordEntriesByWordPrefix("お", 5));
 
         // no result
-        assertEquals(new ArrayList<SQLiteWordEntry>(), coreDict.getWordEntriesByWordPrefix("あ", 1));
+        assertEquals(new ArrayList<SQLiteWordEntry>(), dictCore.getWordEntriesByWordPrefix("あ", 1));
     }
 
     @Test
@@ -179,19 +177,19 @@ public class SQLiteDictCoreTest {
         entries.add(SQLiteWordEntry.construct("おはよう", "ohayou", "「おはよう」の説明"));
         entries.add(SQLiteWordEntry.construct("こんばんは", "konbanha", "「こんばんは」の説明"));
 
-        coreDict.insertAll(entries);
+        dictCore.insertAll(entries);
 
         // multi results
-        assertEquals(entries.subList(0, 2), coreDict.getWordEntriesByRomajiPrefix("i", 2));
-        assertEquals(entries.subList(0, 3), coreDict.getWordEntriesByRomajiPrefix("i", 3));
-        assertEquals(entries.subList(0, 3), coreDict.getWordEntriesByRomajiPrefix("i", 5));
-        assertEquals(entries.subList(1, 3), coreDict.getWordEntriesByRomajiPrefix("ima", 5));
+        assertEquals(entries.subList(0, 2), dictCore.getWordEntriesByRomajiPrefix("i", 2));
+        assertEquals(entries.subList(0, 3), dictCore.getWordEntriesByRomajiPrefix("i", 3));
+        assertEquals(entries.subList(0, 3), dictCore.getWordEntriesByRomajiPrefix("i", 5));
+        assertEquals(entries.subList(1, 3), dictCore.getWordEntriesByRomajiPrefix("ima", 5));
 
         // only one result
-        assertEquals(entries.subList(3, 4), coreDict.getWordEntriesByRomajiPrefix("o", 5));
+        assertEquals(entries.subList(3, 4), dictCore.getWordEntriesByRomajiPrefix("o", 5));
 
         // no result
-        assertEquals(new ArrayList<SQLiteWordEntry>(), coreDict.getWordEntriesByRomajiPrefix("a", 1));
+        assertEquals(new ArrayList<SQLiteWordEntry>(), dictCore.getWordEntriesByRomajiPrefix("a", 1));
     }
 
     @Test
@@ -210,17 +208,17 @@ public class SQLiteDictCoreTest {
               "「打ち上げ花火」の説明",
               new String[] {"打ち上げ花火", "uchiagehanabi", "打上花火"}
         ));
-        coreDict.insertAll(entries);
+        dictCore.insertAll(entries);
 
-        assertEquals(entries.subList(1, 2), coreDict.queryWordEntries("今日", 10));
-        assertEquals(entries.subList(1, 2), coreDict.queryWordEntries("kyo", 10));
-        assertEquals(entries.subList(1, 2), coreDict.queryWordEntries("konjitsu", 10));
-        assertEquals(entries.subList(0, 1), coreDict.queryWordEntries("ima", 10));
-        assertEquals(entries.subList(2, 3), coreDict.queryWordEntries("打上花火", 10));
+        assertEquals(entries.subList(1, 2), dictCore.queryWordEntries("今日", 10));
+        assertEquals(entries.subList(1, 2), dictCore.queryWordEntries("kyo", 10));
+        assertEquals(entries.subList(1, 2), dictCore.queryWordEntries("konjitsu", 10));
+        assertEquals(entries.subList(0, 1), dictCore.queryWordEntries("ima", 10));
+        assertEquals(entries.subList(2, 3), dictCore.queryWordEntries("打上花火", 10));
 
-        assertEquals(entries.subList(0, 2), coreDict.queryWordEntriesByPrefix("今", 10));
-        assertEquals(entries.subList(1, 2), coreDict.queryWordEntriesByPrefix("k", 10));
-        assertEquals(entries.subList(2, 3), coreDict.queryWordEntriesByPrefix("打", 10));
+        assertEquals(entries.subList(0, 2), dictCore.queryWordEntriesByPrefix("今", 10));
+        assertEquals(entries.subList(1, 2), dictCore.queryWordEntriesByPrefix("k", 10));
+        assertEquals(entries.subList(2, 3), dictCore.queryWordEntriesByPrefix("打", 10));
     }
 
     private void assertCollectionEquals(Collection<?> a, Collection<?> b) {

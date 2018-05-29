@@ -58,7 +58,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      * @return The dict instance.
      */
     public static Dict prepareDict(@NonNull Context context) {
-        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(context).getSQLiteCoreDict();
+        SQLiteDictCore dictCore = SQLiteDictDatabase.getInstance(context).getSQLiteDictCore();
         return new BasicDict(dictCore,
               SpellCheckerManager.getInstance(context),
               TokenizerManager.getInstance());
