@@ -14,4 +14,5 @@
     <string name="level_full_text_translation">全文翻译</string>
     <string name="backspace">退格</string>
     <string name="clear">清除</string>
+    <string name="permission_required">需要权限</string>
 </resources>

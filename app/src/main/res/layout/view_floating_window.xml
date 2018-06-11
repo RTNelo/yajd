@@ -15,7 +15,7 @@
 
     <View
         android:id="@+id/view_left_top"
-        android:background="@android:color/black"
+        android:background="@android:color/transparent"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentTop="true"
@@ -23,7 +23,7 @@
 
     <View
         android:id="@+id/view_right_bottom"
-        android:background="@android:color/black"
+        android:background="@android:color/transparent"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"

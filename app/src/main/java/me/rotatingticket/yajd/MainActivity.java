@@ -1,5 +1,6 @@
 package me.rotatingticket.yajd;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
 import android.arch.lifecycle.ViewModelProviders;
@@ -42,6 +43,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.googlecode.tesseract.android.TessBaseAPI;
@@ -531,6 +533,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK) {
+            Toast.makeText(this, R.string.permission_required, Toast.LENGTH_SHORT).show();
+            return;
+        }
         prepareScreenTranslation();
         prepareMediaProjection(resultCode, data);
     }

@@ -15,4 +15,5 @@
     <string name="level_full_text_translation">Full Text Translation</string>
     <string name="backspace">Backspace</string>
     <string name="clear">Clear</string>
+    <string name="permission_required">Permission Required</string>
 </resources>
