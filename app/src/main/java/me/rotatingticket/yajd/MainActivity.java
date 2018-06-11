@@ -485,19 +485,31 @@ public class MainActivity extends AppCompatActivity {
     private void prepareScreenTranslation() {
         if (floatingView == null) {
             createFloatingWindow();
+        } else {
+            ScreenTranslationService.setOnAccessibilityEventListener(null);
+            removeFloatingWindow();
+            return;
         }
         if (ScreenTranslationService.getOnAccessibilityEventListener() == null) {
-            ScreenTranslationService.setOnAccessibilityEventListener(event -> {
-                Log.e("YAJD_S", String.format("%s %s %s %s", String.valueOf(event.getAction()), String.valueOf(floatingView), String.valueOf(floatingView != null && floatingView.isCapturing()), String.valueOf(event)));
-                if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && floatingView != null && floatingView.isCapturing()) {
-                    Log.e("YAJD_ASS", event.getPackageName().toString());
-                    try {
-                        startOcr(event.getEventTime());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+            ScreenTranslationService.setOnAccessibilityEventListener(new ScreenTranslationService.OnAccessibilityEventListener() {
+                @Override
+                public void onWindowContentChanged(AccessibilityEvent event) {
+                    Log.e("YAJD_S", String.format("%s %s %s %s", String.valueOf(event.getAction()), String.valueOf(floatingView), String.valueOf(floatingView != null && floatingView.isCapturing()), String.valueOf(event)));
+                    if (event.getEventType() == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED && floatingView != null && floatingView.isCapturing()) {
+                        Log.e("YAJD_ASS", event.getPackageName().toString());
+                        try {
+                            startOcr(event.getEventTime());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                    Log.e("YAJD", event.getPackageName().toString());
                 }
-                Log.e("YAJD", event.getPackageName().toString());
+
+                @Override
+                public void onWindowListenerInterrupted() {
+                    removeFloatingWindow();
+                }
             });
         }
         Log.e("YAJD", String.valueOf(ScreenTranslationService.getOnAccessibilityEventListener()));
@@ -633,7 +645,7 @@ public class MainActivity extends AppCompatActivity {
                           .shortTranslate(result, "ja", "zh-cn")
                           .execute();
                     String translated = response.body();
-                    floatingView.setContent(translated);
+                    mainHandler.post(() -> floatingView.setContent(translated));
                     Log.e("YAJD_OCR", "CONTENT_SETTED");
                 }
                 Log.e("YAJD_OCR", "finished");
@@ -641,7 +653,6 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             } finally {
                 mainHandler.post(() -> {
-                    windowManager.addView(floatingView, floatingView.getLayoutParams());
                     processing = false;
                 });
             }
@@ -651,6 +662,7 @@ public class MainActivity extends AppCompatActivity {
     private synchronized String OCR(int x, int y) {
         Log.e("YAJD_OCR", "inner");
         Image image = imageReader.acquireLatestImage();
+        mainHandler.post(() -> windowManager.addView(floatingView, floatingView.getLayoutParams()));
         if (image == null) {
             Log.e("YAJD_OCR", "NULL image");
             return null;
@@ -665,7 +677,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e("YAJD_OCR", "CROPED null");
             return null;
         }
-        tessBaseAPI.setImage(croped);
+
+        int scaleFactor = 4;
+
+        tessBaseAPI.setImage(Bitmap.createScaledBitmap(croped, croped.getWidth() / scaleFactor, croped.getHeight() / scaleFactor, true));
         return tessBaseAPI.getUTF8Text().replace("\n", "");
     }
 
@@ -692,5 +707,14 @@ public class MainActivity extends AppCompatActivity {
         image.close();
 
         return bitmap;
+    }
+
+    private boolean removeFloatingWindow() {
+        if (floatingView != null) {
+            windowManager.removeView(floatingView);
+            floatingView = null;
+            return true;
+        }
+        return false;
     }
 }

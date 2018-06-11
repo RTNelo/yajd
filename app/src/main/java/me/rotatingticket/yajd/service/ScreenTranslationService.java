@@ -8,6 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 public class ScreenTranslationService extends AccessibilityService {
     public interface OnAccessibilityEventListener {
         void onWindowContentChanged(AccessibilityEvent event);
+        void onWindowListenerInterrupted();
     }
 
     private static OnAccessibilityEventListener onAccessibilityEventListener;
@@ -33,5 +34,8 @@ public class ScreenTranslationService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
+        if (onAccessibilityEventListener != null) {
+            onAccessibilityEventListener.onWindowListenerInterrupted();
+        }
     }
 }
