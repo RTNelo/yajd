@@ -12,4 +12,6 @@
     <string name="service_notification_channel_name">服务通知</string>
     <string name="screen_translation_service_label">屏幕翻译服务</string>
     <string name="level_full_text_translation">全文翻译</string>
+    <string name="backspace">退格</string>
+    <string name="clear">清除</string>
 </resources>

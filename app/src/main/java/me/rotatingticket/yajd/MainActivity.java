@@ -95,6 +95,17 @@ public class MainActivity extends AppCompatActivity {
     private boolean processing;
     private Handler mainHandler;
 
+    public void clear(View view) {
+        refreshHandwriting();
+    }
+
+    public void backspace(View view) {
+        searchViewSrcEditText.getText().delete(
+              Integer.max(searchViewSrcEditText.getSelectionStart() - 1, 0),
+              searchViewSrcEditText.getSelectionEnd()
+        );
+    }
+
     private static class HandwritingCandidatesAdapter extends RecyclerView.Adapter {
 
         static class HandwritingCandidatesViewHolder extends RecyclerView.ViewHolder {
@@ -347,10 +358,6 @@ public class MainActivity extends AppCompatActivity {
 
         // on handwriting candidates changed
         viewModel.getHandwritingCandidates().observe(this, handwritingResult -> {
-            // invisible if there is no handwriting candidates
-            handwritingCandidatesView.setVisibility(
-                  handwritingResult == null || handwritingResult.size() == 0 ? View.GONE : View.VISIBLE
-            );
             // update the display
             handwritingCandidatesAdapter.setCandidates(handwritingResult);
         });
@@ -445,7 +452,6 @@ public class MainActivity extends AppCompatActivity {
      */
     void clearHandwritingCandidates() {
         handwritingCandidatesAdapter.setCandidates(null);
-        handwritingCandidatesView.setVisibility(View.GONE);
     }
 
     /**
@@ -654,7 +660,7 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
         tessBaseAPI.setImage(croped);
-        return tessBaseAPI.getUTF8Text();
+        return tessBaseAPI.getUTF8Text().replace("\n", "");
     }
 
     @Override

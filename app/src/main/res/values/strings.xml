@@ -13,4 +13,6 @@
     <string name="service_notification_channel_name">Service Notifications</string>
     <string name="screen_translation_service_label">Screen Translation Service</string>
     <string name="level_full_text_translation">Full Text Translation</string>
+    <string name="backspace">Backspace</string>
+    <string name="clear">Clear</string>
 </resources>
